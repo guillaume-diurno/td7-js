@@ -46,17 +46,33 @@ function callback_AffLiv(req){
     reponse.forEach(element => {
         let c = document.createElement("p");
         c.innerHTML = element.idLivre+" - "+element.titreLivre;
+        c.onclick = function(){
+            let p = prompt("Prêt de \""+element.titreLivre+"\".\nn° de l'emprunteur ?");
+            if (p!=null && p!=""){
+                requeteAJAX("php/requeteEmprunt.php?idAdherent="+p+"&idLivre="+element.idLivre, console.log);
+                requeteAJAX("php/requeteLivre.php", callback_AffLiv);
+                requeteAJAX("php/requeteEmprunt.php", callback_AffEmp);
+                requeteAJAX("php/requeteAdherent.php", callback_AffAd);
+            }
+        };
+        c.style.cursor = "pointer";
         listLivD.appendChild(c);
     });
 }
-
 function callback_AffEmp(req){
     listLivE.innerHTML = "";
-    console.log(req);
     let reponse = JSON.parse(req.responseText);
     reponse.forEach(element => {
         let c = document.createElement("p");
         c.innerHTML = element.idLivre+" - "+element.titreLivre;
+        c.onclick = function(){
+            if (confirm("Livre prêté à "+element.nomAdherent+".\nRetour de ce livre ?")){
+                requeteAJAX("php/requeteEmprunt.php?idLivre="+element.idLivre, console.log);
+                requeteAJAX("php/requeteLivre.php", callback_AffLiv);
+                requeteAJAX("php/requeteEmprunt.php", callback_AffEmp);
+                requeteAJAX("php/requeteAdherent.php", callback_AffAd);
+            }
+        };
         listLivE.appendChild(c);
     });
 }
@@ -64,7 +80,7 @@ function callback_AffEmp(req){
 function callback_Ad(req){
     let reponse = JSON.parse(req.responseText);
     if (reponse.length != 0){
-        let s = "", titres, nomA = reponse[0].nomadherent;
+        let s = "", titres = "", nomA = reponse[0].nomadherent;
         reponse.forEach(element => {
             titres = titres+"- "+element.titreLivre+"\n";
         });
