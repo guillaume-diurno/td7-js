@@ -69,6 +69,15 @@ class Model {
         $req_prep->execute($values);
     }
 
+    public static function rendre($idLivre){
+        $sql = "DELETE FROM emprunt WHERE (emprunt.idLivre = :idLivre)";
+        $req_prep = Model::$pdo->prepare($sql);
+        $values = array(
+            "idLivre" => $idLivre,
+        );
+        $req_prep->execute($values);
+    }
+
     public static function getLivresByID($idAdherent){
         $sql = "SELECT nomadherent,titreLivre FROM livre
                 JOIN emprunt ON livre.idLivre=emprunt.idLivre
