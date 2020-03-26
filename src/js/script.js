@@ -4,17 +4,6 @@ let listLivE = document.getElementById("listeLivresEmpruntes");
 let addA = document.getElementById("ajouterAdherent");
 let addL = document.getElementById("ajouterLivre");
 
-addA.onclick = function(){
-    ajouterAdherentAjax(document.getElementById("nomAdherent").value);
-    requeteAJAX("php/requeteAdherent.php", callback_AffAd);
-
-};
-addL.onclick = function(){
-    ajouterLivreAjax(document.getElementById("titreLivre").value);
-    requeteAJAX("php/requeteLivre.php", callback_AffLiv);
-};
-
-
 function ajouterAdherentAjax(nom){
     let url = "./php/requeteAdherent.php?nom=" + nom;
     let requete = new XMLHttpRequest();
@@ -56,5 +45,14 @@ function callback_AffLiv(req){
         listLivD.appendChild(c);
     });
 }
+
+addA.onclick = function(){
+    ajouterAdherentAjax(document.getElementById("nomAdherent").value);
+    requeteAJAX("php/requeteAdherent.php", callback_AffAd);
+};
+addL.onclick = function(){
+    ajouterLivreAjax(document.getElementById("titreLivre").value);
+    requeteAJAX("php/requeteLivre.php", callback_AffLiv);
+};
 requeteAJAX("php/requeteAdherent.php", callback_AffAd);
 requeteAJAX("php/requeteLivre.php", callback_AffLiv);
