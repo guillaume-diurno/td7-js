@@ -25,6 +25,9 @@ class Model {
     }
 
     public static function selectAll($table){
+        //demande tout les tuples d'une table passee en argument pour l'affichage
+        //livre = tous les livres disponibles
+        //emprunt=tous les livres empruntés (non disponibles)
         if ($table == "adherent"){
             $sql = "SELECT * FROM adherent;";
         }else if ($table == "livre"){
@@ -39,6 +42,9 @@ class Model {
     }
 
     public static function ajouter($table, $donnee){
+        //table est le nom d'une table et donnee le nom d'un nouvel adherent ou d'un nouveau livre
+        //si $table = adherent on ajoute un nouvel adherent de nom=donnee
+        //si $table = livre on ajoute un nouveau livre de titre=donee
         switch ($table) {
             case "adherent":
                 $sql = "INSERT INTO adherent VALUES (NULL, :nom)";
@@ -60,6 +66,7 @@ class Model {
     }
 
     public static function emprunter($idAdherent, $idLivre){
+        //Requete envoyée pour ajouter une ligne deans les emprunts
         $sql = "INSERT INTO emprunt VALUES (:idAdherent, :idLivre)";
         $req_prep = Model::$pdo->prepare($sql);
         $values = array(
@@ -70,7 +77,7 @@ class Model {
     }
 
     public static function rendre($idLivre){
-        $sql = "DELETE FROM emprunt WHERE (emprunt.idLivre = :idLivre)";
+        $sql = "DELETE FROM emprunt WHERE (emprunt.idLivre = :idLivre)"; //Requete envoyée pour rendre un livre. On supprime le tuple de la table des emprunts
         $req_prep = Model::$pdo->prepare($sql);
         $values = array(
             "idLivre" => $idLivre,
@@ -79,7 +86,8 @@ class Model {
     }
 
     public static function getLivresByID($idAdherent){
-        $sql = "SELECT nomadherent,titreLivre FROM livre
+        //Requete envoyée pour demander les livres d'un utilisateur.
+        $sql = "SELECT nomadherent,titreLivre FROM livre  
                 JOIN emprunt ON livre.idLivre=emprunt.idLivre
                 JOIN adherent ON adherent.idAdherent = emprunt.idAdherent
                 Where emprunt.idAdherent= :idAdherent";
