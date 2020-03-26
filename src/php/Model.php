@@ -61,6 +61,17 @@ class Model {
         }
     }
 
+    public static function getLivresByID($idAdherent){
+        $sql= (" SELECT titreLivre FROM livre
+                JOIN emprunt ON livre.idLivre=emprunt.idLivre
+                Where emprunt.idAdherent=" . $idAdherent . ";");
+        echo $sql;
+        $req = Model::$pdo->query($sql);
+        $req->setFetchMode(PDO::FETCH_CLASS, 'Model');
+        $tab = $req->fetchAll();
+        return $tab;
+    }
+
 }
 
 // on initialise la connexion $pdo
