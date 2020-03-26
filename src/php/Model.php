@@ -25,24 +25,25 @@ class Model {
     }
 
     public static function ajouter($table, $donnee){
-        switch ($table):
+        switch ($table) {
             case "adherent":
-                $sql = "INSERT INTO 'adherent' ('idAdherent','nomAdherent') (VALUES :sql_id, :sql_nom)";
-                $tab = array(
-                    "sql_id" => $donnee[idAdherent],
-                );
+                $sql = "INSERT INTO adherent VALUES (NULL, '" . $donnee . "');";
+                echo $sql;
+                Model::$pdo->query($sql);
+                break;
             case "livre":
-                $sql = "INSERT INTO 'livre' ('idLivre','titreLivre') (VALUES :sql_id, :sql_titre)";
-                $tab = array(
-                    "sql_id" => $donnee[idLivre],
-                    "sql_titre" => $donnee[titreLivre]
-                );
+                $sql = "INSERT INTO livre VALUES (NULL, '" . $donnee . "');";
+                echo $sql;
+                Model::$pdo->query($sql);
+                break;
             case "emprunt":
                 $sql = "INSERT INTO 'emprunt' ('idAdherent','idLivre') (VALUES :sql_idA, :sql_idL)";
                 $tab = array(
                     "sql_idA" => $donnee[idAdherent],
                     "sql_idL" => $donnee[idLivre]
                 );
+                break;
+        }
     }
 
 }
