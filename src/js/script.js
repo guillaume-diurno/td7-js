@@ -1,33 +1,58 @@
-
-
 let listA = document.getElementById("listeAdherents");
 let listLivD = document.getElementById("listeLivresDisponibles");
 let listLivE = document.getElementById("listeLivresEmpruntes");
-
 let addA = document.getElementById("ajouterAdherent");
-addA.onclick=function(){ajouterAdherentAjax(document.getElementById("nomAdherent").value , console.log );};
-
 let addL = document.getElementById("ajouterLivre");
-addL.onclick=function(){ajouterLivreAjax(document.getElementById("titreLivre").value , console.log );};
 
-
-function ajouterAdherentAjax(nom, callback){
-    let url = "http://webinfo.iutmontp.univ-montp2.fr/~spohrq/JS/td7-js/src/php/requeteAdherent.php?nom=" + nom;
+function ajouterAdherentAjax(nom){
+    let url = "./php/requeteAdherent.php?nom=" + nom;
     let requete = new XMLHttpRequest();
     requete.open("GET", url, true);
-    requete.addEventListener("load", function () {
-        callback(requete);
-    });
-    requete.send(null);}
-
-function ajouterLivreAjax(titre, callback){
-    console.log(titre);
-    let url = "http://webinfo.iutmontp.univ-montp2.fr/~spohrq/JS/td7-js/src/php/requeteLivre.php?titre=" + titre;
-    console.log(url);
-    let requete = new XMLHttpRequest();
-    requete.open("GET", url, true);
-    requete.addEventListener("load", function () {
-        callback(requete);
-    });
     requete.send(null);
 }
+
+function ajouterLivreAjax(titre){
+    let url = "./php/requeteLivre.php?titre=" + titre;
+    let requete = new XMLHttpRequest();
+    requete.open("GET", url, true);
+    requete.send(null);
+}
+
+function requeteAJAX(url, callback){
+    let req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.addEventListener("load", function () {
+        callback(req);
+    });
+    req.send(null);
+}
+
+function callback_AffAd(req){
+    listA.innerHTML = "";
+    let reponse = JSON.parse(req.responseText);
+    reponse.forEach(element => {
+        let c = document.createElement("p");
+        c.innerHTML = element.idAdherent+" - "+element.nomAdherent;
+        listA.appendChild(c);
+    });
+}
+function callback_AffLiv(req){
+    listLivD.innerHTML = "";
+    let reponse = JSON.parse(req.responseText);
+    reponse.forEach(element => {
+        let c = document.createElement("p");
+        c.innerHTML = element.idLivre+" - "+element.titreLivre;
+        listLivD.appendChild(c);
+    });
+}
+
+addA.onclick = function(){
+    ajouterAdherentAjax(document.getElementById("nomAdherent").value);
+    requeteAJAX("php/requeteAdherent.php", callback_AffAd);
+};
+addL.onclick = function(){
+    ajouterLivreAjax(document.getElementById("titreLivre").value);
+    requeteAJAX("php/requeteLivre.php", callback_AffLiv);
+};
+requeteAJAX("php/requeteAdherent.php", callback_AffAd);
+requeteAJAX("php/requeteLivre.php", callback_AffLiv);
