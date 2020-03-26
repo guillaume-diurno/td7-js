@@ -28,10 +28,9 @@ class Model {
         if ($table == "adherent"){
             $sql = "SELECT * FROM adherent;";
         }else if ($table == "livre"){
-            $sql = "SELECT * FROM livre;";
-        }
-        if ($table == "emprunt"){
-            $sql = "SELECT * FROM emprunt;";
+            $sql = "SELECT * FROM livre WHERE idLivre NOT IN (SELECT idLivre FROM emprunt);";
+        }else if ($table == "emprunt"){
+            $sql = "SELECT emprunt.idLivre, livre.titreLivre FROM emprunt JOIN livre ON livre.idLivre = emprunt.idLivre;";
         }
         $req = Model::$pdo->query($sql);
         $req->setFetchMode(PDO::FETCH_CLASS, 'Model');
@@ -62,10 +61,10 @@ class Model {
     }
 
     public static function getLivresByID($idAdherent){
-        $sql= (" SELECT titreLivre FROM livre
+        $sql= (" SELECT nomadherent,titreLivre FROM livre
                 JOIN emprunt ON livre.idLivre=emprunt.idLivre
+                JOIN adherent ON adherent.idAdherent = emprunt.idAdherent
                 Where emprunt.idAdherent=" . $idAdherent . ";");
-        echo $sql;
         $req = Model::$pdo->query($sql);
         $req->setFetchMode(PDO::FETCH_CLASS, 'Model');
         $tab = $req->fetchAll();
