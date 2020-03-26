@@ -41,33 +41,46 @@ class Model {
     public static function ajouter($table, $donnee){
         switch ($table) {
             case "adherent":
-                $sql = "INSERT INTO adherent VALUES (NULL, '" . $donnee . "');";
-                echo $sql;
-                Model::$pdo->query($sql);
+                $sql = "INSERT INTO adherent VALUES (NULL, :nom)";
+                $req_prep = Model::$pdo->prepare($sql);
+                $values = array(
+                    "nom" => $donnee,
+                );
+                $req_prep->execute($values);
                 break;
             case "livre":
-                $sql = "INSERT INTO livre VALUES (NULL, '" . $donnee . "');";
-                echo $sql;
-                Model::$pdo->query($sql);
-                break;
-            case "emprunt":
-                $sql = "INSERT INTO 'emprunt' ('idAdherent','idLivre') (VALUES :sql_idA, :sql_idL)";
-                $tab = array(
-                    "sql_idA" => $donnee[idAdherent],
-                    "sql_idL" => $donnee[idLivre]
+                $sql = "INSERT INTO livre VALUES (NULL, :titre)";
+                $req_prep = Model::$pdo->prepare($sql);
+                $values = array(
+                    "titre" => $donnee,
                 );
+                $req_prep->execute($values);
                 break;
         }
     }
 
+    public static function emprunter($idAdherent, $idLivre){
+        $sql = "INSERT INTO emprunt VALUES (:idAdherent, :idLivre)";
+        $req_prep = Model::$pdo->prepare($sql);
+        $values = array(
+            "idAdherent" => $idAdherent,
+            "idLivre" => $idLivre,
+        );
+        $req_prep->execute($values);
+    }
+
     public static function getLivresByID($idAdherent){
-        $sql= (" SELECT nomadherent,titreLivre FROM livre
+        $sql = "SELECT nomadherent,titreLivre FROM livre
                 JOIN emprunt ON livre.idLivre=emprunt.idLivre
                 JOIN adherent ON adherent.idAdherent = emprunt.idAdherent
-                Where emprunt.idAdherent=" . $idAdherent . ";");
-        $req = Model::$pdo->query($sql);
-        $req->setFetchMode(PDO::FETCH_CLASS, 'Model');
-        $tab = $req->fetchAll();
+                Where emprunt.idAdherent= :idAdherent";
+        $req_prep = Model::$pdo->prepare($sql);
+        $values = array(
+            "idAdherent" => $idAdherent,
+        );
+        $req_prep->execute($values);
+        $req_prep->setFetchMode(PDO::FETCH_CLASS, 'Model');
+        $tab = $req_prep->fetchAll();
         return $tab;
     }
 
