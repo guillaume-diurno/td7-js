@@ -24,6 +24,21 @@ class Model {
         }
     }
 
+    public static function selectAll($table){
+        if ($table == "adherent"){
+            $sql = "SELECT * FROM adherent;";
+        }else if ($table == "livre"){
+            $sql = "SELECT * FROM livre;";
+        }
+        if ($table == "emprunt"){
+            $sql = "SELECT * FROM emprunt;";
+        }
+        $req = Model::$pdo->query($sql);
+        $req->setFetchMode(PDO::FETCH_CLASS, 'Model');
+        $tab = $req->fetchAll();
+        return $tab;
+    }
+
     public static function ajouter($table, $donnee){
         switch ($table) {
             case "adherent":
