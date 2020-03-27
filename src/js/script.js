@@ -4,102 +4,19 @@ let listLivE = document.getElementById("listeLivresEmpruntes");
 let addA = document.getElementById("ajouterAdherent");
 let addL = document.getElementById("ajouterLivre");
 
-function ajouterAdherentAjax(nom){
-    let url = "./php/requeteAdherent.php?nom=" + nom;
-    let requete = new XMLHttpRequest();
-    requete.open("GET", url, true);
-    requete.send(null);
-}
-
-function ajouterLivreAjax(titre){
-    let url = "./php/requeteLivre.php?titre=" + titre;
-    let requete = new XMLHttpRequest();
-    requete.open("GET", url, true);
-    requete.send(null);
-}
-
-function requeteAJAX(url, callback){
-    let req = new XMLHttpRequest();
-    req.open("GET", url, true);
-    req.addEventListener("load", function () {
-        callback(req);
-    });
-    req.send(null);
-}
-
-function callback_AffAd(req){
-    listA.innerHTML = "";
-    let reponse = JSON.parse(req.responseText);
-    reponse.forEach(element => {
-        let c = document.createElement("p");
-        c.innerHTML = element.idAdherent+" - "+element.nomAdherent;
-        c.onclick = function(){
-            requeteAJAX("php/requeteAdherent.php?id="+element.idAdherent, callback_Ad);
-        };
-        c.style.cursor = "pointer";
-        listA.appendChild(c);
-    });
-}
-function callback_AffLiv(req){
-    listLivD.innerHTML = "";
-    let reponse = JSON.parse(req.responseText);
-    reponse.forEach(element => {
-        let c = document.createElement("p");
-        c.innerHTML = element.idLivre+" - "+element.titreLivre;
-        c.onclick = function(){
-            let p = prompt("Prêt de \""+element.titreLivre+"\".\nn° de l'emprunteur ?");
-            if (p!=null && p!=""){
-                requeteAJAX("php/requeteEmprunt.php?idAdherent="+p+"&idLivre="+element.idLivre, console.log);
-                requeteAJAX("php/requeteLivre.php", callback_AffLiv);
-                requeteAJAX("php/requeteEmprunt.php", callback_AffEmp);
-                requeteAJAX("php/requeteAdherent.php", callback_AffAd);
-            }
-        };
-        c.style.cursor = "pointer";
-        listLivD.appendChild(c);
-    });
-}
-function callback_AffEmp(req){
-    listLivE.innerHTML = "";
-    let reponse = JSON.parse(req.responseText);
-    reponse.forEach(element => {
-        let c = document.createElement("p");
-        c.innerHTML = element.idLivre+" - "+element.titreLivre;
-        c.onclick = function(){
-            if (confirm("Livre prêté à "+element.nomAdherent+".\nRetour de ce livre ?")){
-                requeteAJAX("php/requeteEmprunt.php?idLivre="+element.idLivre, console.log);
-                requeteAJAX("php/requeteLivre.php", callback_AffLiv);
-                requeteAJAX("php/requeteEmprunt.php", callback_AffEmp);
-                requeteAJAX("php/requeteAdherent.php", callback_AffAd);
-            }
-        };
-        listLivE.appendChild(c);
-    });
-}
-
-function callback_Ad(req){
-    let reponse = JSON.parse(req.responseText);
-    if (reponse.length != 0){
-        let s = "", titres = "", nomA = reponse[0].nomadherent;
-        reponse.forEach(element => {
-            titres = titres+"- "+element.titreLivre+"\n";
-        });
-        if (reponse.length > 1) s="s";
-        alert(nomA+" a "+reponse.length+" emprunt"+s+" en ce moment :\n"+titres);
-    }else alert("Cette personne n'a pas d'emprunt.");
+function majAll(){
+    Adherent.requeteAJAX("php/requeteAdherent.php", Adherent.callback_AffAd);
+    Livre.requeteAJAX("php/requeteLivre.php", Livre.callback_AffLiv);
+    Emprunt.requeteAJAX("php/requeteEmprunt.php", Emprunt.callback_AffEmp);
 }
 
 addA.onclick = function(){
-    ajouterAdherentAjax(document.getElementById("nomAdherent").value);
-    requeteAJAX("php/requeteAdherent.php", callback_AffAd);
+    Adherent.ajouterAdherentAjax(document.getElementById("nomAdherent").value);
+    majAll();
 };
 addL.onclick = function(){
-    ajouterLivreAjax(document.getElementById("titreLivre").value);
-    requeteAJAX("php/requeteLivre.php", callback_AffLiv);
+    Livre.ajouterLivreAjax(document.getElementById("titreLivre").value);
+    majAll();
 };
-document.addEventListener("DOMContentLoaded", function(){
-    requeteAJAX("php/requeteAdherent.php", callback_AffAd);
-    requeteAJAX("php/requeteLivre.php", callback_AffLiv);
-    requeteAJAX("php/requeteEmprunt.php", callback_AffEmp);
-});
+document.addEventListener("DOMContentLoaded", function(){ majAll(); });
 
